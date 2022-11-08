@@ -12,6 +12,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/koa": "^2.13.5",
+    "@types/koa-logger": "^3.1.2",
     "@types/koa-router": "^7.4.4",
     "@types/node": "^18.11.9",
     "@typescript-eslint/eslint-plugin": ">=5.31.0",
@@ -25,7 +26,9 @@
   },
   "dependencies": {
     "koa": "^2.13.4",
+    "koa-logger": "^3.2.1",
     "koa-router": "^12.0.0",
+    "node-fetch": "^3.2.10",
     "pm2": "^5.2.2",
     "ts-node": "^10.9.1"
   }
