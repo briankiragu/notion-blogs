@@ -1,0 +1,14 @@
+# Dependencies
+node_modules
+
+# Formatting files
+.editorconfig
+.eslintrc.js
+.prettierrc.js
+
+# Editor files
+.vscode
+
+# Environment files
+.env.*
+!.env.example
