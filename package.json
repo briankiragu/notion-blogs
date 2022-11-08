@@ -2,9 +2,9 @@
   "name": "notion-blogs",
   "version": "1.0.0",
   "description": "",
-  "main": "./src/main.ts",
+  "main": "./src/main.mjs",
   "scripts": {
-    "dev": "pm2 restart ecosystem.config.js",
+    "dev": "ts-node ./src/main.mjs",
     "serve": "pm2 restart ecosystem.config.js --env production"
   },
   "keywords": [],

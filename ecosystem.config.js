@@ -3,8 +3,7 @@ module.exports = {
   apps: [
     {
       name: "notion-blogs",
-      script: "./src/main.ts",
-      interpreter: "./node_modules/.bin/ts-node",
+      script: "./src/main.mjs",
       env: {},
       env_production: {
         NODE_ENV: "production",

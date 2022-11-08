@@ -6,7 +6,7 @@ import Router from "koa-router";
 import logger from "koa-logger";
 
 // Import composables...
-import { getJournals } from "./composables/useData.mjs";
+import { getJournals, getPages } from "./composables/useData.mjs";
 
 // Create a Koa app instance.
 const app = new Koa();
@@ -17,7 +17,10 @@ const router = new Router();
 // Create a route.
 router.get("/", async (ctx, next) => {
   // Get the database from the API.
-  ctx.body = await getJournals(`MMM Blog`);
+  ctx.body = {
+    journals: await getJournals(`MMM Blog`),
+    pages: await getPages(`acf094ca-ee9d-45e3-bb8e-d67bb8547c02`),
+  };
 
   await next();
 });
