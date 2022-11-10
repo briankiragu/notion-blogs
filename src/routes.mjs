@@ -3,19 +3,25 @@ import Router from "koa-router";
 
 // Import composables...
 import { getJournals, getPages } from "./composables/useData.mjs";
-import { createMasterList } from "./composables/useFiles.mjs";
+import { writeMasterList } from "./composables/useFiles.mjs";
+import { formatPages } from "./composables/useFormatting.mjs";
 
 // Create a Koa-Router instance.
 const router = new Router();
 
-// Create a route.
+/**
+ * Get the journals from the database based on the name and use the first one to get all the pages. Use the pages to create a master JSON file.
+ */
 router.get("/", async (ctx, next) => {
   try {
     // Get the database from the API.
     const journals = await getJournals(`MMM Blog`);
 
-    // If the journals are more than 0, return an error message.
-    if (journals.results.length > 1) {
+    // If the journals are empty, throw an error.
+    if (!journals.results.length) {
+      throw new Error(`Error: There is no journal with this name.`);
+      // If the journals are more than 0, throw an error message.
+    } else if (journals.results.length > 1) {
       throw new Error(
         `Error: There is more than one journal with the same name.`
       );
@@ -24,8 +30,14 @@ router.get("/", async (ctx, next) => {
     // Get the pages from the API using the journal ID.
     const pages = await getPages(journals.results[0].id);
 
+    // Get the formatted pages.
+    const formattedPages = formatPages(pages);
+
     // Create a master list from the pages.
-    const masterList = await createMasterList(journals.results[0].id, pages);
+    const masterList = await writeMasterList(
+      journals.results[0].id,
+      formattedPages
+    );
 
     // Set the response body.
     ctx.body = masterList;

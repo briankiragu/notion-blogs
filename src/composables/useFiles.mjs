@@ -8,8 +8,9 @@ import { writeFile } from "node:fs";
  * @param {string} dir The directory to write the file to. Defaults to the data directory.
  *
  * @returns {Promise<string>} The path to the file.
+ * @author Brian Kariuki <bkariuki@hotmail.com>
  */
-const createMasterList = async (id, data, dir = "./src/data") => {
+const writeMasterList = async (id, data, dir = "./src/data") => {
   // Create the filename.
   const filename = `${dir}/${id}.json`;
 
@@ -23,4 +24,4 @@ const createMasterList = async (id, data, dir = "./src/data") => {
 };
 
 // Export the methods.
-export { createMasterList };
+export { writeMasterList };
