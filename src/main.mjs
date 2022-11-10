@@ -1,9 +1,10 @@
+// Import and instantiate dotenv.
+import dotenv from "dotenv";
+dotenv.config();
+
 // Import dependencies...
 import Koa from "koa";
 import Router from "koa-router";
-
-// Import middleware dependencies...
-import logger from "koa-logger";
 
 // Import composables...
 import { getJournals, getPages } from "./composables/useData.mjs";
@@ -24,9 +25,6 @@ router.get("/", async (ctx, next) => {
 
   await next();
 });
-
-// Register the middleware...
-app.use(logger());
 
 // Register the routes.
 app.use(router.routes()).use(router.allowedMethods());
