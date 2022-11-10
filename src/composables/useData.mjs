@@ -51,14 +51,14 @@ const getJournals = async (title) => {
 /**
  * Get the pages from the database based on the name.
  *
- * @param {string} databaseID The ID of the journal to query pages from.
+ * @param {string} databaseId The ID of the journal to query pages from.
  *
  * @returns Returns an array of journals.
  * @author Brian Kariuki <bkariuki@hotmail.com>
  */
-const getPages = async (databaseID) => {
+const getPages = async (databaseId) => {
   // Make a request to the API.
-  const response = await fetch(`${apiUrl}/v1/databases/${databaseID}/query`, {
+  const response = await fetch(`${apiUrl}/v1/databases/${databaseId}/query`, {
     method: "POST",
     headers,
     body: JSON.stringify({
@@ -91,5 +91,29 @@ const getPages = async (databaseID) => {
   return data;
 };
 
+/**
+ * Get the page from the database based on the ID.
+ *
+ * @param {string} pageId The ID of the page to retrieve.
+ *
+ * @returns Returns a page from a journals.
+ * @author Brian Kariuki <bkariuki@hotmail.com>
+ */
+const getPage = async (pageId) => {
+  // Make a request to the API.
+  const response = await fetch(`${apiUrl}/v1/pages/${pageId}`, { headers });
+
+  // Check if the request was successful.
+  if (!response.ok) {
+    throw new Error(`Unexpected response ${response.statusText}`);
+  }
+
+  // Get the data from the response.
+  const data = await response.json();
+
+  // Return the data.
+  return data;
+};
+
 // Export the functions.
-export { getJournals, getPages };
+export { getJournals, getPages, getPage };
