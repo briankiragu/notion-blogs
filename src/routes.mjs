@@ -2,8 +2,8 @@
 import Router from "koa-router";
 
 // Import composables...
-import { getJournals, getPages, getPage } from "./composables/useData.mjs";
-import { writeMasterList } from "./composables/useFiles.mjs";
+import { getJournals, getPages } from "./composables/useData.mjs";
+import { readMasterList, writeMasterList } from "./composables/useFiles.mjs";
 import { formatPages } from "./composables/useFormatting.mjs";
 
 // Create a Koa-Router instance.
@@ -34,13 +34,13 @@ router.get("journal", "/journals", async (ctx, next) => {
     const formattedPages = formatPages(pages);
 
     // Create a master list from the pages.
-    const masterList = await writeMasterList(
-      journals.results[0].id,
-      formattedPages
-    );
+    writeMasterList(journals.results[0].id, formattedPages);
+
+    // Read the master list.
+    const data = readMasterList(journals.results[0].id);
 
     // Set the response body.
-    ctx.body = masterList;
+    ctx.body = data;
   } catch (error) {
     // Return the error message as the body.
     ctx.body = error.message;

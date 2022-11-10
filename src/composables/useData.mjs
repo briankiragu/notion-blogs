@@ -4,6 +4,9 @@ import fetch from "node-fetch";
 // Get the API URL.
 const apiUrl = "https://api.notion.com";
 
+// Get the API version.
+const apiVersion = "2022-06-28";
+
 // Get the API key
 const apiKey = "secret_KtsPE4M8GZKB1PH7AiT9gcxlfZPMcyHl9yhTf6a7dEM";
 
@@ -11,7 +14,7 @@ const apiKey = "secret_KtsPE4M8GZKB1PH7AiT9gcxlfZPMcyHl9yhTf6a7dEM";
 const headers = {
   Authorization: `Bearer ${apiKey}`,
   "Content-Type": "application/json",
-  "Notion-Version": "2022-06-28",
+  "Notion-Version": apiVersion,
 };
 
 /**
