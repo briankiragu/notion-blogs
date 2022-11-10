@@ -11,6 +11,11 @@ const formatPages = (pages) => ({
   results: pages.results.map((page) => ({
     id: page.id,
     title: page.properties.Name.title[0].plain_text,
+    status: page.properties.Status.status.name,
+    // eslint-disable-next-line camelcase
+    publish_date: page.properties["Post Date"].date
+      ? page.properties["Post Date"].date.start
+      : null,
     // eslint-disable-next-line camelcase
     last_edited_time: page.last_edited_time,
   })),

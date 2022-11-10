@@ -14,11 +14,8 @@ const router = new Router();
  */
 router.get("journal", "/journals", async (ctx, next) => {
   try {
-    // Get the journal name from the query string.
-    const { name } = ctx.query;
-
     // Get the database from the API.
-    const journals = await getJournals(name);
+    const journals = await getJournals(`MMM Blog`);
 
     // If the journals are empty, throw an error.
     if (!journals.results.length) {

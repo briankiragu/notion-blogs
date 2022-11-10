@@ -4,11 +4,15 @@
     {
       "id": "fd954dd0-c8f3-408c-87d7-2222bd0a7a6f",
       "title": "Blog title example",
+      "status": "Active",
+      "publish_date": "2022-10-26",
       "last_edited_time": "2022-10-22T03:33:00.000Z"
     },
     {
       "id": "aab1e234-d4c9-4d4c-a8ec-67c48ea5a254",
       "title": "Hawaii Vacation",
+      "status": "Active",
+      "publish_date": null,
       "last_edited_time": "2022-11-07T12:17:00.000Z"
     }
   ],
