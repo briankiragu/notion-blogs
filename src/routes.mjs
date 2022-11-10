@@ -12,15 +12,18 @@ const router = new Router();
 /**
  * Get the journals from the database based on the name and use the first one to get all the pages. Use the pages to create a master JSON file.
  */
-router.get("/", async (ctx, next) => {
+router.get("journal", "/journals", async (ctx, next) => {
   try {
+    // Get the journal name from the query string.
+    const { name } = ctx.query;
+
     // Get the database from the API.
-    const journals = await getJournals(`MMM Blog`);
+    const journals = await getJournals(name);
 
     // If the journals are empty, throw an error.
     if (!journals.results.length) {
       throw new Error(`Error: There is no journal with this name.`);
-      // If the journals are more than 0, throw an error message.
+      // If the journals are more than 1, throw an error message.
     } else if (journals.results.length > 1) {
       throw new Error(
         `Error: There is more than one journal with the same name.`
