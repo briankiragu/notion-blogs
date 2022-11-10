@@ -19,7 +19,7 @@ const headers = {
  *
  * @param {string} title Get the title of the database to query for.
  *
- * @returns {Promise<Journal[]>} Returns an array of journals.
+ * @returns Returns an array of journals.
  * @author Brian Kariuki <bkariuki@hotmail.com>
  */
 const getJournals = async (title) => {
@@ -53,7 +53,7 @@ const getJournals = async (title) => {
  *
  * @param {string} databaseID The ID of the journal to query pages from.
  *
- * @returns {Promise<Page[]>} Returns an array of journals.
+ * @returns Returns an array of journals.
  * @author Brian Kariuki <bkariuki@hotmail.com>
  */
 const getPages = async (databaseID) => {
