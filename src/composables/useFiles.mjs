@@ -10,7 +10,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
  * @returns {Promise<string>} The path to the file.
  * @author Brian Kariuki <bkariuki@hotmail.com>
  */
-const writeMasterList = (id, data, dir = "./src/data") => {
+const writeMasterList = (id, data, dir = "./data") => {
   // Create the filename.
   const filename = `${dir}/${id}.json`;
 
@@ -27,14 +27,14 @@ const writeMasterList = (id, data, dir = "./src/data") => {
  * @returns {Record<string, any>} The contents of the file
  * @author Brian Kariuki <bkariuki@hotmail.com>
  */
-const readMasterList = (id, dir = "./src/data") => {
+const readMasterList = (id, dir = "./data") => {
   // Create the filename.
   const filename = `${dir}/${id}.json`;
 
   // Check if the file exists.
   if (!existsSync(filename)) {
     // If the file does not exist, throw an error.
-    throw new Error(`Error: The file does not exist.`);
+    throw new Error(`The file does not exist.`);
   }
 
   // Read the file.

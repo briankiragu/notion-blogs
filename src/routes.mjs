@@ -19,12 +19,10 @@ router.get("journal", "/journals", async (ctx, next) => {
 
     // If the journals are empty, throw an error.
     if (!journals.results.length) {
-      throw new Error(`Error: There is no journal with this name.`);
+      throw new Error(`There is no journal with this name.`);
       // If the journals are more than 1, throw an error message.
     } else if (journals.results.length > 1) {
-      throw new Error(
-        `Error: There is more than one journal with the same name.`
-      );
+      throw new Error(`There is more than one journal with the same name.`);
     }
 
     // Get the pages from the API using the journal ID.
@@ -34,13 +32,16 @@ router.get("journal", "/journals", async (ctx, next) => {
     const formattedPages = formatPages(pages);
 
     // Create a master list from the pages.
-    writeMasterList(journals.results[0].id, formattedPages);
+    writeMasterList("mmm-blog", formattedPages);
 
     // Read the master list.
-    const data = readMasterList(journals.results[0].id);
+    const data = readMasterList("mmm-blog");
 
     // Set the response body.
     ctx.body = data;
+    // ctx.body = {
+    //   message: `Successfully updated the master list. ${data.results.length} pages were found.`,
+    // };
   } catch (error) {
     // Return the error message as the body.
     ctx.body = error.message;
