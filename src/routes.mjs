@@ -4,13 +4,18 @@ import Router from "koa-router";
 // Import composables...
 import { getJournals, getPages } from "./composables/useData.mjs";
 import { readMasterList, writeMasterList } from "./composables/useFiles.mjs";
-import { formatPages } from "./composables/useFormatting.mjs";
+import {
+  compareData,
+  manageFolders,
+  prepareData,
+} from "./composables/usePages.mjs";
 
 // Create a Koa-Router instance.
 const router = new Router();
 
 /**
- * Get the journals from the database based on the name and use the first one to get all the pages. Use the pages to create a master JSON file.
+ * Get the journals from the database based on the name and use the first one to get all the pages.
+ * Use the pages to create a master JSON file.
  */
 router.get("journal", "/journals", async (ctx, next) => {
   try {
@@ -29,19 +34,30 @@ router.get("journal", "/journals", async (ctx, next) => {
     const pages = await getPages(journals.results[0].id);
 
     // Get the formatted pages.
-    const formattedPages = formatPages(pages);
+    const incomingPages = prepareData(pages);
+
+    // Read the current master list.
+    const existingPages = readMasterList("mmm-blog");
+
+    // Compare the incoming data with the existing data.
+    const comparedPages = compareData(
+      incomingPages.results,
+      existingPages.results
+    );
+
+    // Generate the folders.
+    manageFolders(comparedPages);
 
     // Create a master list from the pages.
-    writeMasterList("mmm-blog", formattedPages);
-
-    // Read the master list.
-    const data = readMasterList("mmm-blog");
+    writeMasterList("mmm-blog", incomingPages);
 
     // Set the response body.
-    ctx.body = data;
-    // ctx.body = {
-    //   message: `Successfully updated the master list. ${data.results.length} pages were found.`,
-    // };
+    ctx.body = `
+      Successfully updated the master list:
+        ${comparedPages.toStore.length} new page(s) was found.
+        ${comparedPages.toUpdate.length} updated page(s) was found.
+        ${comparedPages.toDestroy.length} deleted page(s) was found.
+    `;
   } catch (error) {
     // Return the error message as the body.
     ctx.body = error.message;
