@@ -26,10 +26,10 @@ const prepareData = (pages) => ({
 /**
  * When an API call is made, the incoming data is checked against the existing data to determine which folder ought to be created, updated or deleted.
  *
- * @param {Array<Record<string, any>>} incoming The incoming page data from the Notion API.
- * @param {Array<Record<string, any>>} existing The existing page data in the current master list.
+ * @param {Array<Record<string, Record<string, any>>>} incoming The incoming page data from the Notion API.
+ * @param {Array<Record<string, Record<string, any>>>} existing The existing page data in the current master list.
  *
- * @returns {Record<string, Array<Record<string, any>>>} The pages that should be added, updated and/or deleted.
+ * @returns {Record<string, Record<string, Record<string, any>>[]>} The pages that should be added, updated and/or deleted.
  * @author Brian Kariuki <bkariuki@hotmail.com>
  */
 const compareData = (incoming, existing) => {
@@ -72,8 +72,11 @@ const compareData = (incoming, existing) => {
   // Get the entries that are in the newEntryIds array. These are the new entries.
   const toStore = incoming.filter((page) => newEntryIds.includes(page.id));
 
-  // Get the entries that are in the updatedEntryIds array. These are the updated entries.
-  const toUpdate = incoming.filter((page) => updatedEntryIds.includes(page.id));
+  // Get the entries that are to be updated (both from and to). These are the updated entries.
+  const toUpdate = updatedEntryIds.map((id) => ({
+    from: existing.find((page) => page.id === id),
+    to: incoming.find((page) => page.id === id),
+  }));
 
   // Get the entries that are in the deletedEntryIds array. These are the deleted entries.
   const toDestroy = existing.filter((page) =>
@@ -88,7 +91,5 @@ const compareData = (incoming, existing) => {
   };
 };
 
-const manageFolders = (pages) => {};
-
 // Export the methods.
-export { prepareData, compareData, manageFolders };
+export { prepareData, compareData };
