@@ -141,8 +141,11 @@ const manageFolders = async (
       // Unpack the HTML (zip) file.
       unpackPageContent(status[0].result.url, foldername);
 
-      // Remove the enqueueId from the config file.
-      writeFileSync(`${foldername}/config.json`, JSON.stringify(page));
+      // Remove the enqueueId and add the export URL to the config file.
+      writeFileSync(
+        `${foldername}/config.json`,
+        JSON.stringify({ ...page, ...{ exportURL: status[0].result.url } })
+      );
     }
   });
 
@@ -180,8 +183,11 @@ const manageFolders = async (
       // Unpack the HTML (zip) file.
       unpackPageContent(status[0].result.url, foldername);
 
-      // Remove the enqueueId from the config file.
-      writeFileSync(`${foldername}/config.json`, JSON.stringify(to));
+      // Remove the enqueueId and add the export URL to the config file.
+      writeFileSync(
+        `${foldername}/config.json`,
+        JSON.stringify({ ...to, ...{ exportURL: status[0].result.url } })
+      );
     }
   });
 
