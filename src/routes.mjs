@@ -60,10 +60,7 @@ router.get("journal", "/journals", async (ctx, next) => {
     );
 
     // Generate the folders and download the HTML (zip) files.
-    const res = manageFolders(
-      { toStore, toUpdate, toDestroy },
-      `./data/${slug}`
-    );
+    manageFolders({ toStore, toUpdate, toDestroy }, `./data/${slug}`);
 
     // Create a master list from the pages.
     writeMasterList(slug, incomingPages, `./data/${slug}`);
