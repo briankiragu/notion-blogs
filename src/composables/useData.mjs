@@ -1,5 +1,8 @@
 // Import dependencies...
 import fetch from "node-fetch";
+import { createWriteStream } from "node:fs";
+import { pipeline } from "node:stream";
+import { promisify } from "node:util";
 
 // Get the API URL.
 const apiUrl = "https://api.notion.com";
@@ -200,12 +203,12 @@ const enqueuePageExport = async (pageId) => {
  * @returns {Promise<Record<string, any>[]>} The status (and export URL} of the blocks.
  * @author Brian Kariuki <bkariuki@hotmail.com>
  */
-const getPageExportStatus = async (blockIds) => {
+const getPageExportStatus = async (taskIds) => {
   // Make a request to the API.
   const response = await fetch("https://www.notion.so/api/v3/getTasks", {
     headers,
     credentials: "include",
-    body: JSON.stringify({ taskIds: blockIds }),
+    body: JSON.stringify({ taskIds }),
   });
 
   // Check if the request was successful.
@@ -220,6 +223,31 @@ const getPageExportStatus = async (blockIds) => {
   return data;
 };
 
+/**
+ * Download the HTML content from the export URL.
+ *
+ * @param {String} url The URL of the HTML content to download.
+ * @param {String} dir The directory to save the file to.
+ *
+ * @returns {Promise<void>}
+ * @author Brian Kariuki <bkariuki@hotmail.com>
+ */
+const downloadPageContent = async (url, dir = "./data") => {
+  // Create a write stream.
+  const streamPipeline = promisify(pipeline);
+
+  // Make a request to the API.
+  const response = await fetch(url);
+
+  // Check if the request was successful.
+  if (!response.ok) {
+    throw new Error(`unexpected response ${response.statusText}`);
+  }
+
+  // Download the file.
+  await streamPipeline(response.body, createWriteStream(dir));
+};
+
 // Export the functions.
 export {
   authenticate,
@@ -228,4 +256,5 @@ export {
   getPage,
   enqueuePageExport,
   getPageExportStatus,
+  downloadPageContent,
 };

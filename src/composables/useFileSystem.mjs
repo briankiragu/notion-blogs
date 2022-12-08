@@ -1,11 +1,20 @@
 import {
+  createReadStream,
+  createWriteStream,
   existsSync,
   mkdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
-import { authenticate, enqueuePageExport } from "./useData.mjs";
+import { pipeline } from "node:stream";
+import { createUnzip } from "node:zlib";
+import {
+  authenticate,
+  downloadPageContent,
+  enqueuePageExport,
+  getPageExportStatus,
+} from "./useData.mjs";
 import { toPageFolderName } from "./useFormatting.mjs";
 
 /**
@@ -55,6 +64,38 @@ const writeMasterList = (id, data, dir = "./data") => {
 };
 
 /**
+ * Download and unzip the HTML (.zip) file from the Notion API.
+ *
+ * @param {String} url The URL of the HTML content to download.
+ * @param {string} dir The directory to save the file to. (Defaults to the data directory.)
+ *
+ * @returns {Promise<void>}
+ * @author Brian Kariuki <bkariuki@hotmail.com>
+ */
+const unpackPageContent = async (url, dir = "./data") => {
+  // Download the HTML (zip) file.
+  await downloadPageContent(url, `${dir}/content.zip`);
+
+  // Create an unzip instance.
+  const unzip = createUnzip();
+
+  // Next, create an input and output stream. The input stream should be
+  // the file path of the .zip and the output stream should be
+  // the file path for Zlib to write the exported data.
+  const input = createReadStream(`${dir}/content.zip`);
+  const output = createWriteStream(`${dir}/content`);
+
+  // Pipe the input stream to the unzip instance and the unzip instance to the output stream.
+  pipeline(input, unzip, output, (err) => {
+    if (err) {
+      console.error("Pipeline failed.", err);
+    } else {
+      console.log("Pipeline succeeded.");
+    }
+  });
+};
+
+/**
  * This function creates, updates and destroys folders & config files and downloads the HTML (zip) files from the Notion API.
  *
  * @param {Record<string, any>} data The data to create, update and/or destroy.
@@ -91,6 +132,18 @@ const manageFolders = async (
       `${foldername}/config.json`,
       JSON.stringify({ ...page, ...{ enqueueId: taskId } })
     );
+
+    // Get the page export status.
+    const status = await getPageExportStatus([taskId]);
+
+    // Check if the page export is complete.
+    if (status[0].status === "complete") {
+      // Unpack the HTML (zip) file.
+      unpackPageContent(status[0].result.url, foldername);
+
+      // Remove the enqueueId from the config file.
+      writeFileSync(`${foldername}/config.json`, JSON.stringify(page));
+    }
   });
 
   // For each page to update from, destroy the existing folder and create a new one with a config file.
@@ -118,6 +171,18 @@ const manageFolders = async (
         ...{ enqueueId: taskId },
       })
     );
+
+    // Get the page export status.
+    const status = await getPageExportStatus([taskId]);
+
+    // Check if the page export is complete.
+    if (status[0].status === "complete") {
+      // Unpack the HTML (zip) file.
+      unpackPageContent(status[0].result.url, foldername);
+
+      // Remove the enqueueId from the config file.
+      writeFileSync(`${foldername}/config.json`, JSON.stringify(to));
+    }
   });
 
   // For each page to destroy, destroy the folder.
