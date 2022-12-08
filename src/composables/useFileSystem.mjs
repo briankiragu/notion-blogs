@@ -5,6 +5,7 @@ import {
   rmSync,
   writeFileSync,
 } from "node:fs";
+import { authenticate, enqueuePageExport } from "./useData.mjs";
 import { toPageFolderName } from "./useFormatting.mjs";
 
 /**
@@ -53,29 +54,47 @@ const writeMasterList = (id, data, dir = "./data") => {
   writeFileSync(filename, JSON.stringify(data));
 };
 
+/**
+ * This function creates, updates and destroys folders & config files and downloads the HTML (zip) files from the Notion API.
+ *
+ * @param {Record<string, any>} data The data to create, update and/or destroy.
+ * @param {string} dir The directory of the data. Defaults to the data directory.
+ *
+ * @returns {Promise<void>} A promise that resolves when the data has been created, updated and/or destroyed.
+ * @author Brian Kariuki <bkariuki@hotmail.com>
+ */
 const manageFolders = async (
   { toStore, toUpdate, toDestroy },
   dir = "./data"
 ) => {
+  // Make a request to authenticate with the Notion API. This is required to download the HTML (zip) files.
+  const credentials = await authenticate();
+
   // Create the directory if it does not exist.
   if (!existsSync(dir)) {
     mkdirSync(dir);
   }
 
   // For each page to store, create a folder and config file.
-  toStore.forEach((page) => {
+  toStore.forEach(async (page) => {
     // Get the folder name.
     const foldername = toPageFolderName(page, dir);
 
     // Create the folder.
     mkdirSync(foldername);
 
+    // Download the page content (HTML zip file).
+    const taskId = await enqueuePageExport(page.id);
+
     // Create the config file.
-    writeFileSync(`${foldername}/config.json`, JSON.stringify(page));
+    writeFileSync(
+      `${foldername}/config.json`,
+      JSON.stringify({ ...page, ...{ enqueueId: taskId } })
+    );
   });
 
   // For each page to update from, destroy the existing folder and create a new one with a config file.
-  toUpdate.forEach(({ from, to }) => {
+  toUpdate.forEach(async ({ from, to }) => {
     // Get the outdated folder name.
     let foldername = toPageFolderName(from, dir);
 
@@ -88,8 +107,17 @@ const manageFolders = async (
     // Create the folder.
     mkdirSync(foldername);
 
+    // Download the page content (HTML zip file).
+    const taskId = await enqueuePageExport(to.id);
+
     // Create the config file.
-    writeFileSync(`${foldername}/config.json`, JSON.stringify(to));
+    writeFileSync(
+      `${foldername}/config.json`,
+      JSON.stringify({
+        ...to,
+        ...{ enqueueId: taskId },
+      })
+    );
   });
 
   // For each page to destroy, destroy the folder.
@@ -100,6 +128,8 @@ const manageFolders = async (
     // Destroy the folder.
     rmSync(foldername, { recursive: true, force: true });
   });
+
+  return credentials;
 };
 
 // Export the methods.

@@ -59,19 +59,26 @@ router.get("journal", "/journals", async (ctx, next) => {
       existingPages.results
     );
 
-    // Generate the folders.
-    manageFolders({ toStore, toUpdate, toDestroy }, `./data/${slug}`);
+    // Generate the folders and download the HTML (zip) files.
+    const res = manageFolders(
+      { toStore, toUpdate, toDestroy },
+      `./data/${slug}`
+    );
 
     // Create a master list from the pages.
     writeMasterList(slug, incomingPages, `./data/${slug}`);
 
     // Set the response body.
-    ctx.body = `
-      Successfully updated the master list:
-        ${toStore.length} page(s) added.
-        ${toUpdate.length} page(s) updated.
-        ${toDestroy.length} page(s) deleted.
-    `;
+    const response = { toStore, toUpdate, toDestroy, res };
+    // `
+    //   Successfully updated the master list:
+    //     ${toStore.length} page(s) added.
+    //     ${toUpdate.length} page(s) updated.
+    //     ${toDestroy.length} page(s) deleted.
+    // `;
+
+    // Set the response body.
+    ctx.body = response;
   } catch (error) {
     // Return the error message as the body.
     ctx.body = error.message;

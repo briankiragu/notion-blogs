@@ -10,11 +10,45 @@ const apiVersion = "2022-06-28";
 // Get the API key
 const apiKey = "secret_KtsPE4M8GZKB1PH7AiT9gcxlfZPMcyHl9yhTf6a7dEM";
 
+// Get the user credentials.
+const apiCredentials = {
+  email: "team@mastermathmentor.com",
+  password: "#digitalwars4314",
+};
+
 // Create the default headers with an authorization token.
 const headers = {
   Authorization: `Bearer ${apiKey}`,
   "Content-Type": "application/json",
   "Notion-Version": apiVersion,
+};
+/**
+ * Authenticate with the Notion API to get the authentication credentials for downloading HMTL (zip) files.
+ *
+ * @param {Record<string, string>} credentials The authentication credentials.
+ *
+ * @returns {Promise<Record<string, string>>} The authentication credentials
+ * @author Brian Kariuki <bkariuki@hotmail.com>
+ */
+const authenticate = async () => {
+  // Make a request to the API.
+  const response = await fetch("https://www.notion.so/api/v3/loginWithEmail", {
+    method: "POST",
+    headers,
+    credentials: "include",
+    body: JSON.stringify(apiCredentials),
+  });
+
+  // Check if the request was successful.
+  if (!response.ok) {
+    throw new Error(`Unexpected response: ${response.statusText}`);
+  }
+
+  // Get the data from the response body.
+  const data = await response.json();
+
+  // Return the data.
+  return { ...response.headers, ...data };
 };
 
 /**
@@ -22,7 +56,7 @@ const headers = {
  *
  * @param {string} title Get the title of the database to query for.
  *
- * @returns Returns an array of journals.
+ * @returns {Promise<Record<string, any>[]>} Returns an array of journals.
  * @author Brian Kariuki <bkariuki@hotmail.com>
  */
 const getJournals = async (title) => {
@@ -56,7 +90,7 @@ const getJournals = async (title) => {
  *
  * @param {string} databaseId The ID of the journal to query pages from.
  *
- * @returns Returns an array of journals.
+ * @returns {Promise<Record<string, any>[]>} Returns an array of journals.
  * @author Brian Kariuki <bkariuki@hotmail.com>
  */
 const getPages = async (databaseId) => {
@@ -99,7 +133,7 @@ const getPages = async (databaseId) => {
  *
  * @param {string} pageId The ID of the page to retrieve.
  *
- * @returns Returns a page from a journals.
+ * @returns {Promise<Record<string, any>>} Returns a page from a journals.
  * @author Brian Kariuki <bkariuki@hotmail.com>
  */
 const getPage = async (pageId) => {
@@ -118,5 +152,80 @@ const getPage = async (pageId) => {
   return data;
 };
 
+/**
+ * Enqueue a task to export a page to HTML.
+ *
+ * @param {string} pageId The ID of the page to export to HTML.
+ *
+ * @returns {Promise<string>} The ID of the export block.
+ * @author Brian Kariuki <bkariuki@hotmail.com>
+ */
+const enqueuePageExport = async (pageId) => {
+  // Make a request to the API.
+  const response = await fetch("https://www.notion.so/api/v3/enqueueTask", {
+    headers,
+    credentials: "include",
+    body: JSON.stringify({
+      task: {
+        eventName: "exportPage",
+        request: {
+          pageId,
+          exportOptions: {
+            exportType: "html",
+            timeZone: "Europe/Paris",
+            locale: "en",
+          },
+        },
+      },
+    }),
+  });
+
+  // Check if the request was successful.
+  if (!response.ok) {
+    throw new Error(`Unexpected response ${response.statusText}`);
+  }
+
+  // Get the data from the response.
+  const data = await response.json();
+
+  // Return the data.
+  return data;
+};
+
+/**
+ * Get the status of the export block(s) provided.
+ *
+ * @param {String[]} blockIds The IDs of the blocks to check the status of.
+ *
+ * @returns {Promise<Record<string, any>[]>} The status (and export URL} of the blocks.
+ * @author Brian Kariuki <bkariuki@hotmail.com>
+ */
+const getPageExportStatus = async (blockIds) => {
+  // Make a request to the API.
+  const response = await fetch("https://www.notion.so/api/v3/getTasks", {
+    headers,
+    credentials: "include",
+    body: JSON.stringify({ taskIds: blockIds }),
+  });
+
+  // Check if the request was successful.
+  if (!response.ok) {
+    throw new Error(`Unexpected response ${response.statusText}`);
+  }
+
+  // Get the data from the response.
+  const data = await response.json();
+
+  // Return the data.
+  return data;
+};
+
 // Export the functions.
-export { getJournals, getPages, getPage };
+export {
+  authenticate,
+  getJournals,
+  getPages,
+  getPage,
+  enqueuePageExport,
+  getPageExportStatus,
+};
