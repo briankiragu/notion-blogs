@@ -4,6 +4,7 @@ module.exports = {
     {
       name: "notion-blogs",
       script: "./src/main.mjs",
+      watch: true,
       env: {},
       env_production: {
         NODE_ENV: "production",
