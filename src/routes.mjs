@@ -69,13 +69,12 @@ router.get("journal", "/journals", async (ctx, next) => {
     writeMasterList(slug, incomingPages, `./data/${slug}`);
 
     // Set the response body.
-    const response = { toStore, toUpdate, toDestroy, res };
-    // `
-    //   Successfully updated the master list:
-    //     ${toStore.length} page(s) added.
-    //     ${toUpdate.length} page(s) updated.
-    //     ${toDestroy.length} page(s) deleted.
-    // `;
+    const response = `
+      Successfully updated the master list:
+        ${toStore.length} page(s) added.
+        ${toUpdate.length} page(s) updated.
+        ${toDestroy.length} page(s) deleted.
+    `;
 
     // Set the response body.
     ctx.body = response;
