@@ -67,10 +67,10 @@ router.get("journal", "/journals", async (ctx, next) => {
 
     // Set the response body.
     const response = `
-      Successfully updated the master list:
-        ${toStore.length} page(s) added.
-        ${toUpdate.length} page(s) updated.
-        ${toDestroy.length} page(s) deleted.
+    Successfully updated the master list:
+      ${toStore.length} page(s) added.
+      ${toUpdate.length} page(s) updated.
+      ${toDestroy.length} page(s) deleted.
     `;
 
     // Set the response body.
