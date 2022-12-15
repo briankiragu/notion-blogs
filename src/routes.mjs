@@ -43,7 +43,7 @@ router.get("journal", "/journals", async (ctx, next) => {
     const pages = await getPages(journals.results[0].id);
 
     // Get the formatted pages.
-    const incomingPages = prepareData(pages);
+    const formattedPages = prepareData(pages);
 
     // Read the current master list.
     let existingPages = readMasterList(slug, `./data/${slug}`);
@@ -55,7 +55,7 @@ router.get("journal", "/journals", async (ctx, next) => {
 
     // Compare the incoming data with the existing data.
     const { toStore, toUpdate, toDestroy } = compareData(
-      incomingPages.results,
+      formattedPages.results,
       existingPages.results
     );
 
@@ -63,7 +63,7 @@ router.get("journal", "/journals", async (ctx, next) => {
     manageFolders({ toStore, toUpdate, toDestroy }, `./data/${slug}`);
 
     // Create a master list from the pages.
-    writeMasterList(slug, incomingPages, `./data/${slug}`);
+    writeMasterList(slug, formattedPages, `./data/${slug}`);
 
     // Set the response body.
     const response = `

@@ -8,9 +8,9 @@
  */
 const toSlug = (str) =>
   str
-    .toLowerCase()
     .replace(/ /g, "-")
-    .replace(/[^\w-]+/g, "");
+    .replace(/[^\w-]+/g, "")
+    .toLowerCase();
 
 /**
  * Create a folder name for a page.
